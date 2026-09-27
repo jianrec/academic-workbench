@@ -1,17 +1,25 @@
 [
   {
     "id": 1,
-    "text": "阅读一篇本领域论文并做精读笔记",
+    "text": "精读一篇 KV cache 压缩方向论文（如 MLA / KV cache 量化），用「原文精读」生成对照笔记",
     "done": false,
-    "created": "2026-01-01 09:00",
+    "created": "2026-09-27 10:00",
     "deadline": "",
     "priority": "高"
   },
   {
     "id": 2,
-    "text": "把想到的问题记进研究日志",
-    "done": true,
-    "created": "2026-01-01 09:00",
+    "text": "本地跑通 vLLM 或 SGLang 推理，记录 TTFT / 吞吐基线数据",
+    "done": false,
+    "created": "2026-09-27 10:00",
+    "deadline": "",
+    "priority": "中"
+  },
+  {
+    "id": 3,
+    "text": "把毕设选题相关的推理优化调研结论记进研究日志",
+    "done": false,
+    "created": "2026-09-27 10:00",
     "deadline": "",
     "priority": "中"
   }

@@ -1,423 +1,234 @@
 {
   "module": "glossary",
-  "title": "外文期刊入门手册·术语速查表（全手册合并）",
-  "source": "《外文期刊入门手册》第三部分文末",
-  "extracted_at": "2026-09-05",
+  "title": "LLM 推理优化 × 缓存压缩·术语速查表",
+  "source": "部署时按领域常用术语整理",
+  "extracted_at": "2026-09-27",
   "convention": "四件套体例：全称 + 缩写 + 中文译名 + 一句话人话解释；「—」表示该项不适用（单词即名称 / 无通行中文译名）",
-  "count": 59,
+  "count": 32,
   "items": [
     {
-      "term": "AFDB",
-      "full_name": "AlphaFold Protein Structure Database",
-      "zh": "AlphaFold 蛋白质结构数据库",
-      "plain_explanation": "DeepMind 与 EMBL-EBI 维护的 2 亿+ 预测结构库",
-      "url": "https://alphafold.ebi.ac.uk/"
+      "term": "KV cache",
+      "full_name": "Key-Value cache",
+      "zh": "键值缓存",
+      "plain_explanation": "自回归解码时缓存各层注意力的 K/V 张量避免重算；显存占用随上下文长度线性增长，是长上下文成本的核心",
+      "url": "https://arxiv.org/abs/2309.06180"
     },
     {
-      "term": "alert",
+      "term": "PagedAttention",
       "full_name": "—",
-      "zh": "提醒 / 订阅推送",
-      "plain_explanation": "检索式或期刊的新内容自动发到邮箱",
-      "url": "见 My NCBI / 各期刊页"
+      "zh": "分页注意力",
+      "plain_explanation": "vLLM 提出：像操作系统管理内存页一样分块管理 KV cache，显存碎片近零，吞吐数量级提升",
+      "url": "https://arxiv.org/abs/2309.06180"
     },
     {
-      "term": "AlphaFold",
+      "term": "continuous batching",
+      "full_name": "iteration-level scheduling",
+      "zh": "连续批处理",
+      "plain_explanation": "Orca（OSDI'22）提出：每个解码迭代步动态拼批，不再等整批跑完，serving 吞吐数倍提升",
+      "url": "https://www.usenix.org/conference/osdi22/presentation/yu"
+    },
+    {
+      "term": "speculative decoding",
+      "full_name": "—",
+      "zh": "推测解码",
+      "plain_explanation": "小模型先起草多个 token、大模型一次并行验证，输出分布无损、解码加速约 2–3 倍",
+      "url": "https://arxiv.org/abs/2211.17192"
+    },
+    {
+      "term": "FlashAttention",
       "full_name": "—",
       "zh": "—",
-      "plain_explanation": "DeepMind 开发的蛋白质结构预测模型系列（2020 年 CASP14 夺冠）",
-      "url": "https://www.nature.com/articles/s41586-021-03819-2"
+      "plain_explanation": "IO 感知的精确注意力实现：tiling 减少对 HBM 的读写，快且省显存，已是训练/推理标配算子",
+      "url": "https://arxiv.org/abs/2205.14135"
     },
     {
-      "term": "APC",
-      "full_name": "Article Processing Charge",
-      "zh": "文章处理费",
-      "plain_explanation": "作者被录用后支付的费用，读者免费",
-      "url": "https://www.plos.org/fees/ （实例）"
-    },
-    {
-      "term": "arXiv",
-      "full_name": "arXiv",
-      "zh": "—",
-      "plain_explanation": "物理起家的预印本库，q-bio 板块偏计算生物",
-      "url": "https://arxiv.org/archive/q-bio"
-    },
-    {
-      "term": "benchmark",
+      "term": "GPTQ",
       "full_name": "—",
-      "zh": "基准",
-      "plain_explanation": "标准化的公开测试集 + 统一指标，用于方法间比较",
-      "url": "https://predictioncenter.org/ （结构预测实例）"
-    },
-    {
-      "term": "bioRxiv",
-      "full_name": "bioRxiv",
       "zh": "—",
-      "plain_explanation": "生物学专用预印本库（冷泉港实验室运营）",
-      "url": "https://www.biorxiv.org/"
+      "plain_explanation": "训练后权重量化方法：INT4/INT3 压权重、精度损失小，单卡可跑大模型",
+      "url": "https://arxiv.org/abs/2210.17323"
     },
     {
-      "term": "BOAI",
-      "full_name": "Budapest Open Access Initiative",
-      "zh": "布达佩斯开放获取倡议",
-      "plain_explanation": "OA 运动的奠基性声明（2002）",
-      "url": "https://www.budapestopenaccessinitiative.org/read/"
+      "term": "AWQ",
+      "full_name": "Activation-aware Weight Quantization",
+      "zh": "激活感知权重量化",
+      "plain_explanation": "保护对激活影响大的少数权重通道的量化方法，低比特下精度更稳",
+      "url": "https://arxiv.org/abs/2306.00978"
     },
     {
-      "term": "CASP",
-      "full_name": "Critical Assessment of Structure Prediction",
-      "zh": "结构预测盲测竞赛",
-      "plain_explanation": "两年一届的蛋白质结构预测独立盲测（1994 年起）",
-      "url": "https://predictioncenter.org/"
+      "term": "FP8",
+      "full_name": "8-bit floating point（E4M3/E5M2）",
+      "zh": "8 位浮点",
+      "plain_explanation": "H100 起进入主流的推理低精度格式，权重与 KV cache 都可用，吞吐/显存直接减半",
+      "url": "https://developer.nvidia.com/blog/"
     },
     {
-      "term": "CiteScore",
-      "full_name": "—（单词即名称）",
-      "zh": "引用分",
-      "plain_explanation": "Elsevier 按 4 年窗口算的期刊平均被引",
-      "url": "https://www.scopus.com/sources"
+      "term": "MLA",
+      "full_name": "Multi-head Latent Attention",
+      "zh": "多头潜在注意力",
+      "plain_explanation": "DeepSeek-V2 提出：把 KV 低秩压缩成潜向量再缓存，长上下文 KV 显存降一个数量级",
+      "url": "https://arxiv.org/abs/2405.04434"
     },
     {
-      "term": "COPE",
-      "full_name": "Committee on Publication Ethics",
-      "zh": "出版伦理委员会",
-      "plain_explanation": "出版伦理规范制定与会员组织",
-      "url": "https://publicationethics.org/members"
+      "term": "GQA",
+      "full_name": "Grouped-Query Attention",
+      "zh": "分组查询注意力",
+      "plain_explanation": "多个 Q 头共享一组 K/V：KV cache 成倍缩小、质量几乎无损，Llama 等主流模型标配",
+      "url": "https://arxiv.org/abs/2305.13245"
     },
     {
-      "term": "Clarivate",
-      "full_name": "Clarivate",
-      "zh": "科睿唯安",
-      "plain_explanation": "运营 Web of Science 与 JCR 的商业分析公司",
-      "url": "https://mjl.clarivate.com/"
+      "term": "MQA",
+      "full_name": "Multi-Query Attention",
+      "zh": "多查询注意力",
+      "plain_explanation": "全部 Q 头共享一组 K/V 的极端形式，KV cache 最小但表达能力略降",
+      "url": "https://arxiv.org/abs/1911.02150"
     },
     {
-      "term": "Crossref",
-      "full_name": "Crossref",
-      "zh": "—",
-      "plain_explanation": "DOI 注册机构，持有撤稿数据库",
-      "url": "https://www.crossref.org/"
-    },
-    {
-      "term": "de novo design",
-      "full_name": "de novo protein design",
-      "zh": "蛋白质从头设计",
-      "plain_explanation": "不依赖天然模板，直接设计全新蛋白质",
-      "url": "https://www.nature.com/articles/s41586-023-06415-8 （实例）"
-    },
-    {
-      "term": "DOI",
-      "full_name": "Digital Object Identifier",
-      "zh": "数字对象标识符",
-      "plain_explanation": "论文的永久编号，以 10. 开头",
-      "url": "https://doi.org/10.1073/pnas.0507655102 （格式实例）"
-    },
-    {
-      "term": "DOAJ",
-      "full_name": "Directory of Open Access Journals",
-      "zh": "开放获取期刊目录",
-      "plain_explanation": "收录通过审核的 OA 期刊的免费名录",
-      "url": "https://doaj.org/"
-    },
-    {
-      "term": "DORA",
-      "full_name": "San Francisco Declaration on Research Assessment",
-      "zh": "旧金山科研评估宣言",
-      "plain_explanation": "反对用期刊指标代替论文质量评价的全球倡议",
-      "url": "https://sfdora.org/"
-    },
-    {
-      "term": "E-utilities",
-      "full_name": "Entrez Programming Utilities",
-      "zh": "NCBI 官方检索接口",
-      "plain_explanation": "用 URL 直接查询 PubMed 计数的官方 API",
-      "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"
-    },
-    {
-      "term": "FAIR",
-      "full_name": "Findable, Accessible, Interoperable, Reusable",
-      "zh": "FAIR 数据原则",
-      "plain_explanation": "数据应可发现、可访问、可互操作、可复用",
-      "url": "https://www.go-fair.org/fair-principles/"
-    },
-    {
-      "term": "foundation model",
+      "term": "prefix caching",
       "full_name": "—",
-      "zh": "基础模型",
-      "plain_explanation": "在海量数据上预训练、可适配多种下游任务的大模型",
-      "url": "—（见第 16 章方向 2/3）"
+      "zh": "前缀缓存",
+      "plain_explanation": "多请求共享相同 prompt 前缀时复用其 KV cache（系统提示、少样本示例最受益）",
+      "url": "https://arxiv.org/abs/2312.07104"
     },
     {
-      "term": "h-index",
+      "term": "RadixAttention",
       "full_name": "—",
-      "zh": "h 指数",
-      "plain_explanation": "有 h 篇论文各被引至少 h 次",
-      "url": "https://www.scimagojr.com/ （期刊层面）"
-    },
-    {
-      "term": "hybrid",
-      "full_name": "hybrid journal",
-      "zh": "混合期刊",
-      "plain_explanation": "订阅制刊 + 单篇可选付费开放",
-      "url": "https://www.elsevier.com/researcher/author/open-access/oa-basics"
-    },
-    {
-      "term": "ICML",
-      "full_name": "International Conference on Machine Learning",
-      "zh": "国际机器学习大会",
-      "plain_explanation": "AI 方法学两大会议之一",
-      "url": "https://icml.cc/"
-    },
-    {
-      "term": "ICLR",
-      "full_name": "International Conference on Learning Representations",
-      "zh": "国际学习表征会议",
-      "plain_explanation": "表征学习方向的主要会议（公开评审文化代表）",
-      "url": "https://iclr.cc/"
-    },
-    {
-      "term": "IF / JIF",
-      "full_name": "(Journal) Impact Factor",
-      "zh": "期刊影响因子",
-      "plain_explanation": "前两年论文的平均被引频次",
-      "url": "https://jcr.clarivate.com/ （需订阅）"
-    },
-    {
-      "term": "ISCB",
-      "full_name": "International Society for Computational Biology",
-      "zh": "国际计算生物学学会",
-      "plain_explanation": "计算生物学的主要学术团体（官方刊物三本，见 13.5）",
-      "url": "https://www.iscb.org/"
-    },
-    {
-      "term": "ISMB",
-      "full_name": "Intelligent Systems for Molecular Biology",
-      "zh": "分子生物学智能系统会议",
-      "plain_explanation": "ISCB 的年度综合会议（论文特刊发表于 Bioinformatics）",
-      "url": "https://www.iscb.org/"
-    },
-    {
-      "term": "ISSN",
-      "full_name": "International Standard Serial Number",
-      "zh": "国际标准连续出版物号",
-      "plain_explanation": "期刊的注册编号",
-      "url": "https://www.issn.org/"
-    },
-    {
-      "term": "iCite",
-      "full_name": "iCite",
       "zh": "—",
-      "plain_explanation": "NIH 的免费论文级文献计量工具（RCR）",
-      "url": "https://icite.od.nih.gov/"
+      "plain_explanation": "SGLang 的前缀树 KV 复用机制：多轮对话与共享前缀场景吞吐显著提升",
+      "url": "https://arxiv.org/abs/2312.07104"
     },
     {
-      "term": "JCR",
-      "full_name": "Journal Citation Reports",
-      "zh": "期刊引用报告",
-      "plain_explanation": "Clarivate 每年发布的期刊指标报告",
-      "url": "https://jcr.clarivate.com/ （需订阅）"
-    },
-    {
-      "term": "MeSH",
-      "full_name": "Medical Subject Headings",
-      "zh": "医学主题词表",
-      "plain_explanation": "NLM 给每条记录标注的规范化主题词",
-      "url": "https://pubmed.ncbi.nlm.nih.gov/help/"
-    },
-    {
-      "term": "MEDLINE",
+      "term": "chunked prefill",
       "full_name": "—",
-      "zh": "医学文献在线数据库",
-      "plain_explanation": "PubMed 的最大子库（NLM 挑选的期刊）",
-      "url": "https://pubmed.ncbi.nlm.nih.gov/about/"
+      "zh": "分块预填充",
+      "plain_explanation": "把长 prompt 切块并与解码请求混合调度，避免长 prefill 卡住整批、降低延迟抖动",
+      "url": "https://arxiv.org/abs/2308.16369"
     },
     {
-      "term": "MJL",
-      "full_name": "Master Journal List",
-      "zh": "主期刊列表",
-      "plain_explanation": "WoS 收录期刊的免费查询入口",
-      "url": "https://mjl.clarivate.com/"
+      "term": "PD 分离",
+      "full_name": "prefill-decode disaggregation",
+      "zh": "预填充/解码分离",
+      "plain_explanation": "把 prefill（算密集）与 decode（访存密集）拆到不同节点的新 serving 架构：Splitwise / DistServe / Mooncake 为代表",
+      "url": "https://arxiv.org/abs/2404.14479"
     },
     {
-      "term": "My NCBI",
-      "full_name": "My NCBI",
-      "zh": "NCBI 个人账号",
-      "plain_explanation": "PubMed 免费账号：存检索、订提醒",
-      "url": "https://www.ncbi.nlm.nih.gov/books/NBK53592/"
-    },
-    {
-      "term": "NeurIPS",
-      "full_name": "Conference on Neural Information Processing Systems",
-      "zh": "神经信息处理系统大会",
-      "plain_explanation": "AI 方法学两大会议之一",
-      "url": "https://neurips.cc/"
-    },
-    {
-      "term": "OA",
-      "full_name": "Open Access",
-      "zh": "开放获取",
-      "plain_explanation": "读者免费获取全文的出版模式",
-      "url": "https://www.budapestopenaccessinitiative.org/read/"
-    },
-    {
-      "term": "OpenReview",
-      "full_name": "OpenReview",
-      "zh": "—",
-      "plain_explanation": "AI 会议公开评审与论文托管平台",
-      "url": "https://openreview.net/"
-    },
-    {
-      "term": "paywall",
-      "full_name": "paywall",
-      "zh": "付费墙",
-      "plain_explanation": "订阅刊\"摘要可见、全文收费\"的访问限制",
+      "term": "TTFT",
+      "full_name": "Time To First Token",
+      "zh": "首 token 延迟",
+      "plain_explanation": "从请求到第一个输出 token 的时间，主要由 prefill 决定",
       "url": "—"
     },
     {
-      "term": "PMC",
-      "full_name": "PubMed Central",
-      "zh": "—",
-      "plain_explanation": "NLM 的论文全文存档库",
-      "url": "https://www.ncbi.nlm.nih.gov/pmc/about/intro/"
+      "term": "TPOT",
+      "full_name": "Time Per Output Token",
+      "zh": "每输出 token 延迟",
+      "plain_explanation": "解码阶段每个 token 的耗时，决定流式输出的「打字速度」",
+      "url": "—"
     },
     {
-      "term": "PMLR",
-      "full_name": "Proceedings of Machine Learning Research",
-      "zh": "机器学习研究论文集",
-      "plain_explanation": "ICML 等会议论文集的出版系列",
-      "url": "https://proceedings.mlr.press/"
-    },
-    {
-      "term": "preprint",
-      "full_name": "preprint",
-      "zh": "预印本",
-      "plain_explanation": "未经同行评审的先行发布版本",
-      "url": "https://arxiv.org/"
-    },
-    {
-      "term": "Q1–Q4",
-      "full_name": "Quartile 1–4",
-      "zh": "四分位分区",
-      "plain_explanation": "学科内按指标排序后的前四分段位",
-      "url": "见 JCR / https://www.scimagojr.com/"
-    },
-    {
-      "term": "q-bio",
-      "full_name": "Quantitative Biology",
-      "zh": "定量生物学",
-      "plain_explanation": "arXiv 的生物学板块（10 个子板块）",
-      "url": "https://arxiv.org/archive/q-bio"
-    },
-    {
-      "term": "RCR",
-      "full_name": "Relative Citation Ratio",
-      "zh": "相对引用比",
-      "plain_explanation": "按领域与时间校正的论文影响力指标",
-      "url": "https://icite.od.nih.gov/"
-    },
-    {
-      "term": "RECOMB",
-      "full_name": "Annual International Conference on Research in Computational Molecular Biology",
-      "zh": "计算分子生物学国际年会",
-      "plain_explanation": "算法导向的计算生物学会议（2026 年第 30 届）",
-      "url": "https://www.recomb.org/"
-    },
-    {
-      "term": "retraction",
-      "full_name": "retraction",
-      "zh": "撤稿",
-      "plain_explanation": "论文的正式作废声明",
-      "url": "https://gitlab.com/crossref/retraction-watch-data"
-    },
-    {
-      "term": "RSS",
-      "full_name": "Really Simple Syndication",
-      "zh": "信息聚合订阅",
-      "plain_explanation": "网站更新的标准化推送格式",
-      "url": "https://rss.arxiv.org/rss/q-bio （实例）"
-    },
-    {
-      "term": "Semantic Scholar",
-      "full_name": "Semantic Scholar",
-      "zh": "—",
-      "plain_explanation": "Ai2 的免费学术搜索引擎（含会议论文）",
-      "url": "https://www.semanticscholar.org/"
-    },
-    {
-      "term": "SJR",
-      "full_name": "SCImago Journal Rank",
-      "zh": "Scimago 期刊排名",
-      "plain_explanation": "按引用来源声望加权的期刊影响力",
-      "url": "https://www.scimagojr.com/"
-    },
-    {
-      "term": "Scimago",
-      "full_name": "SCImago Lab",
-      "zh": "—",
-      "plain_explanation": "发布 SJR 的数据公司",
-      "url": "https://www.scimagojr.com/"
-    },
-    {
-      "term": "Scopus",
-      "full_name": "Scopus",
-      "zh": "—",
-      "plain_explanation": "Elsevier 的摘要引文数据库",
-      "url": "https://www.scopus.com/sources （免费指标页）"
-    },
-    {
-      "term": "TIAB",
-      "full_name": "Title/Abstract",
-      "zh": "题名 / 摘要字段",
-      "plain_explanation": "PubMed 检索字段标签 [tiab]",
-      "url": "https://pubmed.ncbi.nlm.nih.gov/advanced/"
-    },
-    {
-      "term": "TOC alert",
-      "full_name": "Table of Contents alert",
-      "zh": "期刊目录提醒",
-      "plain_explanation": "新刊目录自动发邮箱",
-      "url": "见第 11 章三例"
-    },
-    {
-      "term": "VUS",
-      "full_name": "Variant of Uncertain Significance",
-      "zh": "意义未明变异",
-      "plain_explanation": "临床遗传学中效应未知的基因变异",
-      "url": "https://academic.oup.com/nargab/article/6/4/lqae154/7906241"
-    },
-    {
-      "term": "WoS",
-      "full_name": "Web of Science",
-      "zh": "—",
-      "plain_explanation": "Clarivate 的引文数据库",
-      "url": "https://mjl.clarivate.com/ （免费查收录）"
-    },
-    {
-      "term": "zero-shot",
-      "full_name": "zero-shot",
-      "zh": "零样本",
-      "plain_explanation": "模型不经微调直接执行新任务（评测方式：检验\"通用性\"声称）",
-      "url": "https://doi.org/10.1186/s13059-025-03574-x （实例）"
-    },
-    {
-      "term": "—",
+      "term": "throughput",
       "full_name": "—",
-      "zh": "中科院分区表",
-      "plain_explanation": "中科院文献情报中心的分区产品（2004 起，2026 起停更）",
-      "url": "https://www.fenqubiao.com/ （需登录，个人免费）"
+      "zh": "吞吐",
+      "plain_explanation": "每秒处理的 token 数；与延迟存在根本权衡，报数字必须同时给并发与硬件配置",
+      "url": "—"
     },
     {
-      "term": "—",
-      "full_name": "hijacked journal",
-      "zh": "劫持期刊",
-      "plain_explanation": "冒充真刊的克隆网站骗局",
-      "url": "https://docs.google.com/spreadsheets/d/1ak985WGOgGbJRJbZFanoktAN_UFeExpE/"
+      "term": "SLO",
+      "full_name": "Service Level Objective",
+      "zh": "服务等级目标",
+      "plain_explanation": "serving 系统的延迟约束（如 TTFT < 2s）；调度与 PD 分离设计都围绕达标展开",
+      "url": "—"
     },
     {
-      "term": "—",
-      "full_name": "predatory journal",
-      "zh": "掠夺性期刊",
-      "plain_explanation": "以欺骗流程牟利的期刊",
-      "url": "https://thinkchecksubmit.org/"
+      "term": "tensor parallelism",
+      "full_name": "—",
+      "zh": "张量并行",
+      "plain_explanation": "单层内按权重维度切到多卡（Megatron 式），通信量大、适合单机多卡",
+      "url": "https://arxiv.org/abs/1909.08053"
+    },
+    {
+      "term": "pipeline parallelism",
+      "full_name": "—",
+      "zh": "流水线并行",
+      "plain_explanation": "按层切到多卡，通信少但有气泡，适合跨机",
+      "url": "https://arxiv.org/abs/1909.08053"
+    },
+    {
+      "term": "expert parallelism",
+      "full_name": "—",
+      "zh": "专家并行",
+      "plain_explanation": "MoE 模型把不同专家放到不同卡，路由与负载均衡是核心难题",
+      "url": "—"
+    },
+    {
+      "term": "MoE",
+      "full_name": "Mixture of Experts",
+      "zh": "混合专家",
+      "plain_explanation": "稀疏激活架构：总参数大但每次前向只激活一小部分，推理成本低于同规模稠密模型",
+      "url": "—"
+    },
+    {
+      "term": "CUDA graph",
+      "full_name": "—",
+      "zh": "—",
+      "plain_explanation": "把一串 GPU kernel 录制成图整体重放，消除 kernel 启动开销；解码小批量场景收益显著",
+      "url": "https://developer.nvidia.com/blog/"
+    },
+    {
+      "term": "Triton",
+      "full_name": "—",
+      "zh": "—",
+      "plain_explanation": "OpenAI 的 Python 式 GPU kernel 语言：写自定义注意力/量化算子的主流工具",
+      "url": "https://github.com/triton-lang/triton"
+    },
+    {
+      "term": "vLLM",
+      "full_name": "—",
+      "zh": "—",
+      "plain_explanation": "最流行的开源 LLM serving 引擎，PagedAttention 作者团队出品，社区生态最大",
+      "url": "https://github.com/vllm-project/vllm"
+    },
+    {
+      "term": "SGLang",
+      "full_name": "—",
+      "zh": "—",
+      "plain_explanation": "开源 serving 引擎：RadixAttention 前缀复用与结构化生成见长，前沿特性跟进快",
+      "url": "https://github.com/sgl-project/sglang"
+    },
+    {
+      "term": "TensorRT-LLM",
+      "full_name": "—",
+      "zh": "—",
+      "plain_explanation": "NVIDIA 官方推理优化库：算子与硬件深度绑定，N 卡极限性能常由它跑出",
+      "url": "https://github.com/NVIDIA/TensorRT-LLM"
+    },
+    {
+      "term": "MLPerf Inference",
+      "full_name": "—",
+      "zh": "—",
+      "plain_explanation": "MLCommons 组织的推理基准测试：官方结果跨厂商可比，硬件换代的风向标",
+      "url": "https://mlcommons.org/"
+    },
+    {
+      "term": "系统顶会",
+      "full_name": "OSDI / SOSP / NSDI / ATC / ASPLOS / MLSys",
+      "zh": "—",
+      "plain_explanation": "推理系统论文的主战场；MLSys 是 ML 系统专会，USENIX 系全文免费",
+      "url": "https://www.usenix.org/"
+    },
+    {
+      "term": "arXiv cs.DC",
+      "full_name": "Distributed, Parallel, and Cluster Computing",
+      "zh": "分布式计算板块",
+      "plain_explanation": "serving 系统预印本的主阵地；方法类新工作多在 cs.LG / cs.CL",
+      "url": "https://arxiv.org/list/cs.DC/recent"
+    },
+    {
+      "term": "RoPE 外推",
+      "full_name": "Rotary Position Embedding 长度外推",
+      "zh": "旋转位置编码外推",
+      "plain_explanation": "长上下文的关键技术点：位置编码如何泛化到训练未见的长度（YaRN 等）",
+      "url": "https://arxiv.org/abs/2309.00071"
     }
   ]
 }

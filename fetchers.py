@@ -31,56 +31,56 @@ TIMEOUT = 12  # 每个请求超时秒数
 #       （server.py 的 /api/lit/arxiv 按需拉取），不再作为常驻资讯源轮询。
 # ---------------------------------------------------------------------------
 SOURCES = [
+    # ---- 学术/领域源：LLM 推理优化 × 缓存压缩（2026-09-27 实测可达且可解析）----
     {
-        "key": "nature",
-        "name": "Nature 最新",
+        "key": "semianalysis",
+        "name": "SemiAnalysis",
         "kind": "rss",
-        "url": "https://www.nature.com/nature.rss",
+        "url": "https://semianalysis.com/feed/",
         "limit": 6,
-        "icon": "🔬",
+        "icon": "📊",
     },
     {
-        "key": "science",
-        "name": "Science 最新",
+        "key": "google_research",
+        "name": "Google Research 博客",
         "kind": "rss",
-        "url": "https://www.science.org/action/showFeed?type=etoc&feed=rss&jc=science",
+        "url": "https://research.google/blog/rss/",
         "limit": 6,
-        "icon": "🎓",
+        "icon": "🧪",
     },
     {
-        "key": "cell",
-        "name": "Cell 最新",
+        "key": "nvidia_dev",
+        "name": "NVIDIA 技术博客",
         "kind": "rss",
-        "url": "https://www.cell.com/action/showFeed?type=etoc&feed=rss&jc=cell",
+        "url": "https://developer.nvidia.com/blog/feed",
         "limit": 6,
-        "icon": "🧫",
+        "icon": "💻",
     },
     {
-        "key": "natcomms",
-        "name": "Nature Communications",
+        "key": "hf_blog",
+        "name": "Hugging Face 博客",
         "kind": "rss",
-        "url": "https://www.nature.com/ncomms.rss",
+        "url": "https://huggingface.co/blog/feed.xml",
         "limit": 6,
-        "icon": "📡",
+        "icon": "🤗",
     },
     {
-        "key": "biorxiv",
-        "name": "bioRxiv · 生物信息学",
+        "key": "together",
+        "name": "Together AI 博客",
         "kind": "rss",
-        "url": "https://connect.biorxiv.org/biorxiv_xml.php?subject=bioinformatics",
+        "url": "https://www.together.ai/blog/rss.xml",
         "limit": 6,
-        "icon": "",
-        "oa": True,   # 开放获取：可拼 PDF 直链，供「一键送转写」
+        "icon": "🧩",
     },
     {
-        "key": "medrxiv",
-        "name": "medRxiv 最新",
+        "key": "pytorch",
+        "name": "PyTorch 博客",
         "kind": "rss",
-        "url": "https://connect.medrxiv.org/medrxiv_xml.php?subject=all",
-        "limit": 4,
-        "icon": "",
-        "oa": True,
+        "url": "https://pytorch.org/blog/feed.xml",
+        "limit": 6,
+        "icon": "⚡",
     },
+    # ---- 技术源：与领域无关，保留 ----
     {
         "key": "hackernews",
         "name": "Hacker News",
@@ -106,8 +106,8 @@ SOURCES = [
     },
 ]
 
-# 需要把英文标题翻译成中文的资讯源（顶刊 + 英文预印本）
-TRANSLATE_KEYS = {"nature", "science", "cell", "natcomms", "biorxiv", "medrxiv"}
+# 需要把英文标题翻译成中文的资讯源（领域英文源）
+TRANSLATE_KEYS = {"semianalysis", "google_research", "nvidia_dev", "hf_blog", "together", "pytorch"}
 # 标题翻译的本地缓存（英文标题 → 中文），避免每次刷新重复付费
 _TRANSL_CACHE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "title_translations.json")
 
@@ -146,9 +146,10 @@ def _http_get(url, timeout=TIMEOUT, prefer_direct=False):
 # arXiv（文献工具「arXiv 追踪」用，server.py 按需调用并缓存）
 # ---------------------------------------------------------------------------
 ARXIV_AIBIO_QUERY = (
-    '(cat:q-bio.QM OR cat:q-bio.GN OR cat:q-bio.NC OR cat:q-bio.BM) '
-    'AND ("deep learning" OR "machine learning" OR "artificial intelligence" '
-    'OR "neural network" OR "language model" OR "foundation model")'
+    '(cat:cs.DC OR cat:cs.LG OR cat:cs.CL OR cat:cs.AR) '
+    'AND ("LLM serving" OR "inference optimization" OR "inference engine" '
+    'OR "KV cache" OR "speculative decoding" OR "paged attention" '
+    'OR "model quantization" OR "cache compression")'
 )
 
 
@@ -652,29 +653,30 @@ def fetch_weather():
 # ---------------------------------------------------------------------------
 # 研究兴趣画像：给每条资讯打「与研究领域的相关度」，用来压掉无关噪音
 # 换领域：改下面的关键词表即可（见 SKILL/SKILL.md「第 2 步」）
-# 权重：AI/ML 类词 30 分，生物学类词 18 分，交叉方法类 24 分；每组最多累计 3 个词，上限 100
-# 判定经验：顶刊生物论文通常命中 2+ 个生物词（36+）→ 相关；
-#           纯技术/创业新闻一个词都不中 → 被「只看相关」过滤掉。
+# 权重：推理优化类词 30 分，模型类词 18 分，系统/体系结构类词 24 分；每组最多累计 3 个词，上限 100
+# 判定经验：领域源文章通常命中 1+ 个推理/系统词（24+）→ 相关；
+#           纯综合新闻一个词都不中 → 被「只看相关」过滤掉。
 # 命中词一并返回，前端可显示「为什么相关」
 # ---------------------------------------------------------------------------
 INTEREST_TERMS = {
-    "ai": (30, [
-        "machine learning", "deep learning", "neural network", "transformer", "llm",
-        "large language model", "foundation model", "generative", "diffusion model",
-        "language model", "gpt", "multi-agent", "alphafold", "protein structure prediction",
-        "representation learning", "self-supervised", "fine-tuning", "agent",
-        "artificial intelligence", "ai",
+    "infer": (30, [
+        "inference", "serving", "kv cache", "speculative decoding", "paged attention",
+        "prefix caching", "flashattention", "quantization", "gptq", "awq", "fp8", "int4",
+        "vllm", "sglang", "tensorrt", "inference engine", "decoding", "prefill",
+        "disaggregat", "long context", "throughput", "latency", "ttft", "batching",
+        "cache compression", "attention", "transformer", "llm", "large language model",
     ]),
-    "bio": (18, [
-        "protein", "gene", "genome", "genomic", "cell", "single-cell", "rna", "dna",
-        "crispr", "molecular", "biology", "biological", "organism", "phenotype",
-        "sequence", "expression", "evolution", "microbiome", "neuroscience", "transcriptom",
-        "enzyme", "antibody", "drug", "disease", "patient", "clinical", "tissue", "species",
+    "sys": (24, [
+        "operating system", "distributed", "scheduling", "memory management", "compiler",
+        "kernel", "cuda", "gpu", "accelerator", "hardware", "datacenter", "cluster",
+        "tensor parallelism", "pipeline parallelism", "mixture of experts", "moe",
+        "mlsys", "osdi", "sosp", "asplos", "nsdi",
     ]),
-    "cross": (24, [
-        "single-cell", "spatial transcriptomics", "virtual cell", "protein design",
-        "structure prediction", "drug discovery", "systems biology", "synthetic biology",
-        "gene regulatory", "cell atlas", "multi-omics", "bioinformatics", "computational biology",
+    "model": (18, [
+        "gpt", "qwen", "llama", "deepseek", "claude", "gemini", "mistral",
+        "open-source model", "reasoning", "multimodal", "diffusion", "agent",
+        "fine-tuning", "distillation", "pruning", "sparse", "rlhf", "benchmark",
+        "foundation model", "generative", "ai",
     ]),
 }
 
